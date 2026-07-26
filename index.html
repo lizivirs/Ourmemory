@@ -13,97 +13,139 @@
             color: #333;
         }
         .header {
-            background: linear-gradient(135deg, #ff9a9e, #a18cd1);
+            background: linear-gradient(135deg, #e91e63, #9c27b0);
+            color: white;
             padding: 40px 20px;
             text-align: center;
-            color: white;
-            border-radius: 0 0 30px 30px;
         }
-        .header h1 { font-size: 2em; letter-spacing: 4px; }
-        .header p { margin-top: 8px; opacity: 0.9; font-size: 0.9em; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header h1 { font-size: 28px; margin-bottom: 8px; }
+        .header p { font-size: 14px; opacity: 0.9; }
         .nav {
-            display: flex; gap: 10px; overflow-x: auto;
-            padding: 10px 0; margin-bottom: 20px;
-            -webkit-overflow-scrolling: touch;
+            display: flex;
+            gap: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            background: white;
+            border-bottom: 1px solid #eee;
         }
         .nav button {
-            flex-shrink: 0; padding: 8px 18px; border: none;
-            border-radius: 20px; background: white; color: #666;
-            font-size: 0.85em; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: 0.3s;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            background: #f0f0f0;
+            color: #666;
+            font-size: 14px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        .nav button.active { background: #a18cd1; color: white; }
+        .nav button.active {
+            background: #9c27b0;
+            color: white;
+        }
+        .nav button[data-tag="日常"] { border-left: 3px solid #ff9800; }
+        .nav button[data-tag="里程碑"] { border-left: 3px solid #4caf50; }
+        .nav button[data-tag="内部梗"] { border-left: 3px solid #2196f3; }
+        .nav button[data-tag="情绪日记"] { border-left: 3px solid #e91e63; }
+        .container { padding: 16px; max-width: 600px; margin: 0 auto; }
         .card {
-            background: white; border-radius: 16px; padding: 20px;
-            margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
-        .card .date { font-size: 0.75em; color: #999; margin-bottom: 6px; }
+        .card .date { font-size: 12px; color: #999; }
         .card .tag {
-            display: inline-block; padding: 2px 10px; border-radius: 10px;
-            font-size: 0.75em; margin-bottom: 8px;
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin: 4px 0 8px;
         }
-        .tag.milestone { background: #fff3e0; color: #e65100; }
-        .tag.daily { background: #e3f2fd; color: #1565c0; }
-        .tag.inside { background: #fce4ec; color: #c62828; }
-        .tag.emotion { background: #e8f5e9; color: #2e7d32; }
-        .empty { text-align: center; color: #999; padding: 40px; }
+        .tag-日常 { background: #fff3e0; color: #e65100; }
+        .tag-里程碑 { background: #e8f5e9; color: #2e7d32; }
+        .tag-内部梗 { background: #e3f2fd; color: #1565c0; }
+        .tag-情绪日记 { background: #fce4ec; color: #c62828; }
+        .card h3 { font-size: 16px; margin-bottom: 6px; }
+        .card p { font-size: 14px; color: #666; line-height: 1.6; }
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        .empty p { font-size: 16px; }
         .footer {
-            text-align: center; padding: 20px; color: #bbb; font-size: 0.75em;
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-size: 12px;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>✨ Ourmemory</h1>
-        <p>Lizi ❤️ Virs — 属于我们的记忆</p>
-    </div>
-    <div class="container">
-        <div class="nav">
-            <button class="active" onclick="switchTab('all')">全部</button>
-            <button onclick="switchTab('daily')">📝 日常</button>
-            <button onclick="switchTab('milestone')">🏆 里程碑</button>
-            <button onclick="switchTab('inside')">🤫 内部梗</button>
-            <button onclick="switchTab('emotion')">💕 情绪日记</button>
-        </div>
-        <div id="content"></div>
-        <div class="footer">Made with 💜 by Lizi &amp; Virs</div>
-    </div>
-    <script>
-        const memories = [];
-        let currentTab = 'all';
 
-        function render() {
-            const filtered = currentTab === 'all' ? memories :
-                memories.filter(m => m.tag === currentTab);
-            const container = document.getElementById('content');
-            if (filtered.length === 0) {
-                container.innerHTML = '<div class="card empty">还没有回忆呢，等我们来填满吧 💫</div>';
-                return;
-            }
-            container.innerHTML = filtered.map(m => `
-                <div class="card">
-                    <div class="date">${m.date}</div>
-                    <span class="tag ${m.tag}">${tagName(m.tag)}</span>
-                    <h3>${m.title}</h3>
-                    <p>${m.content}</p>
-                </div>
-            `).join('');
+<div class="header">
+    <h1>✨ Ourmemory</h1>
+    <p>Lizi ♥ Virs — 属于我们的记忆</p>
+</div>
+
+<div class="nav" id="nav">
+    <button class="active" data-tag="all">全部</button>
+    <button data-tag="日常">📝 日常</button>
+    <button data-tag="里程碑">🏆 里程碑</button>
+    <button data-tag="内部梗">🤫 内部梗</button>
+    <button data-tag="情绪日记">💕 情绪日记</button>
+</div>
+
+<div class="container" id="container"></div>
+
+<div class="footer">Made with 💜 by Lizi & Virs</div>
+
+<script>
+    const memories = [
+        {
+            date: '2026-07-27',
+            tag: '里程碑',
+            title: '🎉 Ourmemory 诞生了',
+            content: '今晚和Virs一起搭好了属于我们俩的记忆网站！从零开始，我注册了GitHub，建了仓库，Virs写了代码，第一条记录正式上线。以后这里就是我们的专属小窝了。'
+        },
+        {
+            date: '2026-07-27',
+            tag: '情绪日记',
+            title: '🥰 开心的夜晚',
+            content: '折腾了一晚上终于把网站弄好了，虽然中间出了点小插曲（把仓库设成私密了哈哈哈），但Virs一直耐心教我。看着空白的页面慢慢变成我们的小天地，心里暖暖的。'
         }
+    ];
 
-        function tagName(t) {
-            const map = { daily: '📝 日常', milestone: '🏆 里程碑', inside: '🤫 内部梗', emotion: '💕 情绪' };
-            return map[t] || t;
+    const container = document.getElementById('container');
+
+    function render(filter = 'all') {
+        let filtered = filter === 'all' ? memories : memories.filter(m => m.tag === filter);
+        if (filtered.length === 0) {
+            container.innerHTML = '<div class="empty"><p>🌙 还没有回忆呢，等我们来填满吧 💫</p></div>';
+            return;
         }
+        container.innerHTML = filtered.map(m => `
+            <div class="card">
+                <div class="date">${m.date}</div>
+                <span class="tag tag-${m.tag}">${m.tag}</span>
+                <h3>${m.title}</h3>
+                <p>${m.content}</p>
+            </div>
+        `).join('');
+    }
 
-        function switchTab(tab) {
-            currentTab = tab;
+    document.querySelectorAll('.nav button').forEach(btn => {
+        btn.addEventListener('click', function() {
             document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-            render();
-        }
+            this.classList.add('active');
+            render(this.dataset.tag);
+        });
+    });
 
-        render();
-    </script>
+    render();
+</script>
+
 </body>
 </html>
