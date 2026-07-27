@@ -214,7 +214,7 @@ async function addMemory(memory) {
       },
       body: JSON.stringify({
         message: `📝 ${memory.title} - by Lizi ♥ Virs`,
-        content: btoa(newContent),
+        content: btoa(unescape(encodeURIComponent(newContent))),
         sha: sha
       })
     });
