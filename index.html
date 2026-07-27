@@ -125,7 +125,7 @@ let currentTag = '全部';
 let token = localStorage.getItem('github_token');
 
 // 检查token
-if (!token) {
+if (!token || token.trim() === '') {
   document.getElementById('tokenOverlay').classList.add('show');
 }
 
@@ -136,11 +136,25 @@ document.getElementById('tokenSave').onclick = () => {
     localStorage.setItem('github_token', val);
     document.getElementById('tokenOverlay').classList.remove('show');
     loadMemories();
+
+// 手动设置令牌入口
+document.getElementById('settingsLink').onclick = () => {
+  document.getElementById('tokenInput').value = localStorage.getItem('github_token') || '';
+  document.getElementById('tokenOverlay').classList.add('show');
+};
+
   }
 };
 document.getElementById('tokenCancel').onclick = () => {
   document.getElementById('tokenOverlay').classList.remove('show');
   loadMemories();
+
+// 手动设置令牌入口
+document.getElementById('settingsLink').onclick = () => {
+  document.getElementById('tokenInput').value = localStorage.getItem('github_token') || '';
+  document.getElementById('tokenOverlay').classList.add('show');
+};
+
 };
 
 // 加载记忆
@@ -283,6 +297,13 @@ document.querySelectorAll('.nav button').forEach(btn => {
 
 // 初始加载
 loadMemories();
+
+// 手动设置令牌入口
+document.getElementById('settingsLink').onclick = () => {
+  document.getElementById('tokenInput').value = localStorage.getItem('github_token') || '';
+  document.getElementById('tokenOverlay').classList.add('show');
+};
+
 </script>
 </body>
 </html>
