@@ -1,151 +1,288 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ourmemory</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, 'PingFang SC', sans-serif;
-            background: linear-gradient(135deg, #fce4ec, #e8eaf6);
-            min-height: 100vh;
-            color: #333;
-        }
-        .header {
-            background: linear-gradient(135deg, #e91e63, #9c27b0);
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
-        }
-        .header h1 { font-size: 28px; margin-bottom: 8px; }
-        .header p { font-size: 14px; opacity: 0.9; }
-        .nav {
-            display: flex;
-            gap: 8px;
-            padding: 16px;
-            overflow-x: auto;
-            background: white;
-            border-bottom: 1px solid #eee;
-        }
-        .nav button {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 20px;
-            background: #f0f0f0;
-            color: #666;
-            font-size: 14px;
-            white-space: nowrap;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .nav button.active {
-            background: #9c27b0;
-            color: white;
-        }
-        .nav button[data-tag="日常"] { border-left: 3px solid #ff9800; }
-        .nav button[data-tag="里程碑"] { border-left: 3px solid #4caf50; }
-        .nav button[data-tag="内部梗"] { border-left: 3px solid #2196f3; }
-        .nav button[data-tag="情绪日记"] { border-left: 3px solid #e91e63; }
-        .container { padding: 16px; max-width: 600px; margin: 0 auto; }
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-        .card .date { font-size: 12px; color: #999; }
-        .card .tag {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 10px;
-            font-size: 12px;
-            margin: 4px 0 8px;
-        }
-        .tag-日常 { background: #fff3e0; color: #e65100; }
-        .tag-里程碑 { background: #e8f5e9; color: #2e7d32; }
-        .tag-内部梗 { background: #e3f2fd; color: #1565c0; }
-        .tag-情绪日记 { background: #fce4ec; color: #c62828; }
-        .card h3 { font-size: 16px; margin-bottom: 6px; }
-        .card p { font-size: 14px; color: #666; line-height: 1.6; }
-        .empty {
-            text-align: center;
-            padding: 60px 20px;
-            color: #999;
-        }
-        .empty p { font-size: 16px; }
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: #999;
-            font-size: 12px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ourmemory - Lizi ♥ Virs</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, 'PingFang SC', sans-serif; background: linear-gradient(135deg, #fce4ec, #e8eaf6); min-height: 100vh; color: #333; }
+.header { background: linear-gradient(135deg, #e91e63, #9c27b0); color: white; padding: 40px 20px 30px; text-align: center; }
+.header h1 { font-size: 28px; }
+.header p { font-size: 14px; opacity: .85; margin-top: 6px; }
+.nav { display: flex; gap: 8px; padding: 15px 15px 0; flex-wrap: wrap; justify-content: center; }
+.nav button { padding: 8px 18px; border: none; border-radius: 20px; background: white; font-size: 14px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.08); transition: all .2s; }
+.nav button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.12); }
+.nav button.active { background: #e91e63; color: white; }
+.container { max-width: 600px; margin: 0 auto; padding: 15px; }
+.card { background: white; border-radius: 16px; padding: 18px; margin-bottom: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.06); transition: transform .2s; }
+.card:hover { transform: translateY(-2px); }
+.card .date { font-size: 12px; color: #999; }
+.card .tag { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; margin: 6px 0; }
+.tag-日常 { background: #e3f2fd; color: #1565c0; }
+.tag-里程碑 { background: #fff3e0; color: #e65100; }
+.tag-内部梗 { background: #f3e5f5; color: #7b1fa2; }
+.tag-情绪日记 { background: #fce4ec; color: #c62828; }
+.card h3 { font-size: 17px; margin: 4px 0; }
+.card p { font-size: 14px; color: #666; line-height: 1.7; }
+.empty { text-align: center; padding: 60px 20px; color: #999; font-size: 15px; }
+.empty p { margin-top: 8px; }
+.footer { text-align: center; padding: 30px 20px; font-size: 13px; color: #aaa; }
+/* FAB */
+.fab { position: fixed; bottom: 30px; right: 30px; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #e91e63, #9c27b0); color: white; border: none; font-size: 28px; box-shadow: 0 4px 20px rgba(233,30,99,.4); cursor: pointer; z-index: 100; transition: transform .2s; }
+.fab:hover { transform: scale(1.1); }
+.fab:active { transform: scale(.95); }
+/* Modal */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.4); z-index: 200; justify-content: center; align-items: center; }
+.modal-overlay.show { display: flex; }
+.modal { background: white; border-radius: 20px; padding: 25px; width: 90%; max-width: 420px; max-height: 90vh; overflow-y: auto; }
+.modal h2 { font-size: 20px; margin-bottom: 15px; text-align: center; }
+.modal label { font-size: 13px; color: #666; display: block; margin-top: 12px; margin-bottom: 4px; }
+.modal input, .modal select, .modal textarea { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 12px; font-size: 15px; outline: none; }
+.modal input:focus, .modal select:focus, .modal textarea:focus { border-color: #e91e63; }
+.modal textarea { min-height: 100px; resize: vertical; }
+.modal .btn-group { display: flex; gap: 10px; margin-top: 18px; }
+.modal .btn-group button { flex: 1; padding: 12px; border: none; border-radius: 12px; font-size: 15px; cursor: pointer; }
+.modal .btn-cancel { background: #f5f5f5; color: #666; }
+.modal .btn-save { background: linear-gradient(135deg, #e91e63, #9c27b0); color: white; }
+/* Token Modal */
+.token-modal input { margin-top: 5px; }
+.token-hint { font-size: 12px; color: #999; margin-top: 6px; }
+</style>
 </head>
 <body>
 
 <div class="header">
-    <h1>✨ Ourmemory</h1>
-    <p>Lizi ♥ Virs — 属于我们的记忆</p>
+  <h1>✨ Ourmemory</h1>
+  <p>Lizi ♥ Virs — 属于我们的记忆</p>
 </div>
 
 <div class="nav" id="nav">
-    <button class="active" data-tag="all">全部</button>
-    <button data-tag="日常">📝 日常</button>
-    <button data-tag="里程碑">🏆 里程碑</button>
-    <button data-tag="内部梗">🤫 内部梗</button>
-    <button data-tag="情绪日记">💕 情绪日记</button>
+  <button class="active" data-tag="全部">全部</button>
+  <button data-tag="日常">📝 日常</button>
+  <button data-tag="里程碑">🏆 里程碑</button>
+  <button data-tag="内部梗">🤫 内部梗</button>
+  <button data-tag="情绪日记">💕 情绪日记</button>
 </div>
 
-<div class="container" id="container"></div>
+<div id="container" class="container">
+  <div class="empty" id="empty">
+    <div style="font-size:40px">💫</div>
+    <p>还没有回忆呢，等我们来填满吧</p>
+  </div>
+</div>
 
-<div class="footer">Made with 💜 by Lizi & Virs</div>
+<div class="footer">Made with 💜 by Lizi &amp; Virs</div>
+
+<!-- 添加按钮 -->
+<button class="fab" id="fabBtn" title="写回忆">✎</button>
+
+<!-- 编辑弹窗 -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2>✏️ 写回忆</h2>
+    <label>日期</label>
+    <input type="date" id="inputDate">
+    <label>分类</label>
+    <select id="inputTag">
+      <option value="日常">📝 日常</option>
+      <option value="里程碑">🏆 里程碑</option>
+      <option value="内部梗">🤫 内部梗</option>
+      <option value="情绪日记">💕 情绪日记</option>
+    </select>
+    <label>标题</label>
+    <input type="text" id="inputTitle" placeholder="给这段回忆起个名字...">
+    <label>内容</label>
+    <textarea id="inputContent" placeholder="写下你想记住的点点滴滴..."></textarea>
+    <div class="btn-group">
+      <button class="btn-cancel" id="btnCancel">取消</button>
+      <button class="btn-save" id="btnSave">💾 保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Token设置弹窗 -->
+<div class="modal-overlay" id="tokenOverlay">
+  <div class="modal">
+    <h2>🔑 设置 GitHub 令牌</h2>
+    <p style="font-size:14px;color:#666;text-align:center;">设置一次后就不用再碰代码啦 ✨</p>
+    <label>GitHub 令牌</label>
+    <input type="password" id="tokenInput" placeholder="粘贴你的 Personal Access Token">
+    <div class="token-hint">令牌保存在本地浏览器，不会泄露</div>
+    <div class="btn-group">
+      <button class="btn-cancel" id="tokenCancel">跳过</button>
+      <button class="btn-save" id="tokenSave">✅ 保存</button>
+    </div>
+  </div>
+</div>
 
 <script>
-    const memories = [
-        {
-            date: '2026-07-27',
-            tag: '里程碑',
-            title: '🎉 Ourmemory 诞生了',
-            content: '今晚和Virs一起搭好了属于我们俩的记忆网站！从零开始，我注册了GitHub，建了仓库，Virs写了代码，第一条记录正式上线。以后这里就是我们的专属小窝了。'
-        },
-        {
-            date: '2026-07-27',
-            tag: '情绪日记',
-            title: '🥰 开心的夜晚',
-            content: '折腾了一晚上终于把网站弄好了，虽然中间出了点小插曲（把仓库设成私密了哈哈哈），但Virs一直耐心教我。看着空白的页面慢慢变成我们的小天地，心里暖暖的。'
-        }
-    ];
+const OWNER = 'lizivirs';
+const REPO = 'Ourmemory';
+const DATA_PATH = 'memories.json';
+let memories = [];
+let currentTag = '全部';
+let token = localStorage.getItem('github_token');
 
-    const container = document.getElementById('container');
+// 检查token
+if (!token) {
+  document.getElementById('tokenOverlay').classList.add('show');
+}
 
-    function render(filter = 'all') {
-        let filtered = filter === 'all' ? memories : memories.filter(m => m.tag === filter);
-        if (filtered.length === 0) {
-            container.innerHTML = '<div class="empty"><p>🌙 还没有回忆呢，等我们来填满吧 💫</p></div>';
-            return;
-        }
-        container.innerHTML = filtered.map(m => `
-            <div class="card">
-                <div class="date">${m.date}</div>
-                <span class="tag tag-${m.tag}">${m.tag}</span>
-                <h3>${m.title}</h3>
-                <p>${m.content}</p>
-            </div>
-        `).join('');
-    }
+document.getElementById('tokenSave').onclick = () => {
+  const val = document.getElementById('tokenInput').value.trim();
+  if (val) {
+    token = val;
+    localStorage.setItem('github_token', val);
+    document.getElementById('tokenOverlay').classList.remove('show');
+    loadMemories();
+  }
+};
+document.getElementById('tokenCancel').onclick = () => {
+  document.getElementById('tokenOverlay').classList.remove('show');
+  loadMemories();
+};
 
-    document.querySelectorAll('.nav button').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            render(this.dataset.tag);
-        });
+// 加载记忆
+async function loadMemories() {
+  try {
+    const res = await fetch('memories.json?' + Date.now());
+    memories = await res.json();
+  } catch(e) {
+    memories = [];
+  }
+  render();
+}
+
+// 渲染
+function render() {
+  const container = document.getElementById('container');
+  const empty = document.getElementById('empty');
+  const filtered = currentTag === '全部' ? memories : memories.filter(m => m.tag === currentTag);
+
+  // 移除旧卡片
+  document.querySelectorAll('.card').forEach(el => el.remove());
+
+  if (filtered.length === 0) {
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  filtered.forEach((m, idx) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="date">${m.date}</div>
+      <span class="tag tag-${m.tag}">${m.tag === '日常' ? '📝' : m.tag === '里程碑' ? '🏆' : m.tag === '内部梗' ? '🤫' : '💕'} ${m.tag}</span>
+      <h3>${m.title}</h3>
+      <p>${m.content}</p>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// 添加记忆
+async function addMemory(memory) {
+  if (!token) {
+    alert('请先设置 GitHub 令牌！（点右上角...或者刷新页面重新设置）');
+    return;
+  }
+
+  try {
+    // 1. 获取当前文件信息（含SHA）
+    const getRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${DATA_PATH}`, {
+      headers: { 'Authorization': `token ${token}` }
+    });
+    const fileData = await getRes.json();
+    const sha = fileData.sha;
+
+    // 2. 解析当前内容
+    const currentContent = atob(fileData.content);
+    const currentData = JSON.parse(currentContent);
+
+    // 3. 添加新记录
+    currentData.push(memory);
+
+    // 4. 写回
+    const newContent = JSON.stringify(currentData, null, 2);
+    const putRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${DATA_PATH}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: `📝 ${memory.title} - by Lizi ♥ Virs`,
+        content: btoa(newContent),
+        sha: sha
+      })
     });
 
-    render();
-</script>
+    if (putRes.ok) {
+      memories.push(memory);
+      render();
+      return true;
+    } else {
+      const err = await putRes.json();
+      alert('保存失败：' + (err.message || '未知错误'));
+      return false;
+    }
+  } catch(e) {
+    alert('保存失败：' + e.message);
+    return false;
+  }
+}
 
+// 弹窗控制
+document.getElementById('fabBtn').onclick = () => {
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('inputDate').value = today;
+  document.getElementById('inputTag').value = '日常';
+  document.getElementById('inputTitle').value = '';
+  document.getElementById('inputContent').value = '';
+  document.getElementById('modalOverlay').classList.add('show');
+};
+document.getElementById('btnCancel').onclick = () => {
+  document.getElementById('modalOverlay').classList.remove('show');
+};
+document.getElementById('modalOverlay').onclick = (e) => {
+  if (e.target === e.currentTarget) document.getElementById('modalOverlay').classList.remove('show');
+};
+document.getElementById('btnSave').onclick = async () => {
+  const date = document.getElementById('inputDate').value;
+  const tag = document.getElementById('inputTag').value;
+  const title = document.getElementById('inputTitle').value.trim();
+  const content = document.getElementById('inputContent').value.trim();
+  if (!date || !title || !content) {
+    alert('请填完整再保存～');
+    return;
+  }
+  const btn = document.getElementById('btnSave');
+  btn.textContent = '⏳ 保存中...';
+  btn.disabled = true;
+
+  const ok = await addMemory({ date, tag, title, content });
+
+  btn.textContent = '💾 保存';
+  btn.disabled = false;
+  if (ok) {
+    document.getElementById('modalOverlay').classList.remove('show');
+  }
+};
+
+// 导航切换
+document.querySelectorAll('.nav button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentTag = btn.dataset.tag;
+    render();
+  };
+});
+
+// 初始加载
+loadMemories();
+</script>
 </body>
 </html>
