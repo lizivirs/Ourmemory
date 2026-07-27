@@ -28,11 +28,10 @@ body { font-family: -apple-system, 'PingFang SC', sans-serif; background: linear
 .empty { text-align: center; padding: 60px 20px; color: #999; font-size: 15px; }
 .empty p { margin-top: 8px; }
 .footer { text-align: center; padding: 30px 20px; font-size: 13px; color: #aaa; }
-/* FAB */
+.footer a { color: #bbb; text-decoration: underline; cursor: pointer; font-size: 12px; }
 .fab { position: fixed; bottom: 30px; right: 30px; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #e91e63, #9c27b0); color: white; border: none; font-size: 28px; box-shadow: 0 4px 20px rgba(233,30,99,.4); cursor: pointer; z-index: 100; transition: transform .2s; }
 .fab:hover { transform: scale(1.1); }
 .fab:active { transform: scale(.95); }
-/* Modal */
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.4); z-index: 200; justify-content: center; align-items: center; }
 .modal-overlay.show { display: flex; }
 .modal { background: white; border-radius: 20px; padding: 25px; width: 90%; max-width: 420px; max-height: 90vh; overflow-y: auto; }
@@ -45,7 +44,6 @@ body { font-family: -apple-system, 'PingFang SC', sans-serif; background: linear
 .modal .btn-group button { flex: 1; padding: 12px; border: none; border-radius: 12px; font-size: 15px; cursor: pointer; }
 .modal .btn-cancel { background: #f5f5f5; color: #666; }
 .modal .btn-save { background: linear-gradient(135deg, #e91e63, #9c27b0); color: white; }
-/* Token Modal */
 .token-modal input { margin-top: 5px; }
 .token-hint { font-size: 12px; color: #999; margin-top: 6px; }
 </style>
@@ -72,12 +70,10 @@ body { font-family: -apple-system, 'PingFang SC', sans-serif; background: linear
   </div>
 </div>
 
-<div class="footer">Made with 💜 by Lizi &amp; Virs</div>
+<div class="footer">Made with 💜 by Lizi &amp; Virs<br><a id="settingsLink">⚙️ 设置令牌</a></div>
 
-<!-- 添加按钮 -->
 <button class="fab" id="fabBtn" title="写回忆">✎</button>
 
-<!-- 编辑弹窗 -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <h2>✏️ 写回忆</h2>
@@ -101,7 +97,6 @@ body { font-family: -apple-system, 'PingFang SC', sans-serif; background: linear
   </div>
 </div>
 
-<!-- Token设置弹窗 -->
 <div class="modal-overlay" id="tokenOverlay">
   <div class="modal">
     <h2>🔑 设置 GitHub 令牌</h2>
@@ -122,45 +117,49 @@ const REPO = 'Ourmemory';
 const DATA_PATH = 'memories.json';
 let memories = [];
 let currentTag = '全部';
-let token = localStorage.getItem('github_token');
 
-// 检查token
-if (!token || token.trim() === '') {
+function getToken() {
+  return localStorage.getItem('github_token');
+}
+
+function setToken(val) {
+  localStorage.setItem('github_token', val);
+}
+
+function b64Encode(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+function b64Decode(str) {
+  return decodeURIComponent(escape(atob(str)));
+}
+
+if (!getToken() || getToken().trim() === '') {
   document.getElementById('tokenOverlay').classList.add('show');
 }
 
-document.getElementById('tokenSave').onclick = () => {
-  const val = document.getElementById('tokenInput').value.trim();
+document.getElementById('tokenSave').onclick = function() {
+  var val = document.getElementById('tokenInput').value.trim();
   if (val) {
-    token = val;
-    localStorage.setItem('github_token', val);
+    setToken(val);
     document.getElementById('tokenOverlay').classList.remove('show');
     loadMemories();
-
-// 手动设置令牌入口
-document.getElementById('settingsLink').onclick = () => {
-  document.getElementById('tokenInput').value = localStorage.getItem('github_token') || '';
-  document.getElementById('tokenOverlay').classList.add('show');
-};
-
   }
 };
-document.getElementById('tokenCancel').onclick = () => {
+
+document.getElementById('tokenCancel').onclick = function() {
   document.getElementById('tokenOverlay').classList.remove('show');
   loadMemories();
+};
 
-// 手动设置令牌入口
-document.getElementById('settingsLink').onclick = () => {
-  document.getElementById('tokenInput').value = localStorage.getItem('github_token') || '';
+document.getElementById('settingsLink').onclick = function() {
+  document.getElementById('tokenInput').value = getToken() || '';
   document.getElementById('tokenOverlay').classList.add('show');
 };
 
-};
-
-// 加载记忆
 async function loadMemories() {
   try {
-    const res = await fetch('memories.json?' + Date.now());
+    var res = await fetch('memories.json?' + Date.now());
     memories = await res.json();
   } catch(e) {
     memories = [];
@@ -168,14 +167,12 @@ async function loadMemories() {
   render();
 }
 
-// 渲染
 function render() {
-  const container = document.getElementById('container');
-  const empty = document.getElementById('empty');
-  const filtered = currentTag === '全部' ? memories : memories.filter(m => m.tag === currentTag);
+  var container = document.getElementById('container');
+  var empty = document.getElementById('empty');
+  var filtered = currentTag === '全部' ? memories : memories.filter(function(m) { return m.tag === currentTag; });
 
-  // 移除旧卡片
-  document.querySelectorAll('.card').forEach(el => el.remove());
+  document.querySelectorAll('.card').forEach(function(el) { el.remove(); });
 
   if (filtered.length === 0) {
     empty.style.display = 'block';
@@ -183,54 +180,42 @@ function render() {
   }
   empty.style.display = 'none';
 
-  filtered.forEach((m, idx) => {
-    const card = document.createElement('div');
+  filtered.forEach(function(m) {
+    var card = document.createElement('div');
     card.className = 'card';
-    card.innerHTML = `
-      <div class="date">${m.date}</div>
-      <span class="tag tag-${m.tag}">${m.tag === '日常' ? '📝' : m.tag === '里程碑' ? '🏆' : m.tag === '内部梗' ? '🤫' : '💕'} ${m.tag}</span>
-      <h3>${m.title}</h3>
-      <p>${m.content}</p>
-    `;
+    var emoji = m.tag === '日常' ? '📝' : m.tag === '里程碑' ? '🏆' : m.tag === '内部梗' ? '🤫' : '💕';
+    card.innerHTML = '<div class="date">' + m.date + '</div><span class="tag tag-' + m.tag + '">' + emoji + ' ' + m.tag + '</span><h3>' + m.title + '</h3><p>' + m.content + '</p>';
     container.appendChild(card);
   });
 }
 
-// 添加记忆
 async function addMemory(memory) {
+  var token = getToken();
   if (!token) {
-    alert('请先设置 GitHub 令牌！（点右上角...或者刷新页面重新设置）');
-    return;
+    alert('请先设置 GitHub 令牌！');
+    return false;
   }
-
   try {
-    // 1. 获取当前文件信息（含SHA）
-    const getRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${DATA_PATH}`, {
-      headers: { 'Authorization': `token ${token}` }
-    });
-    const fileData = await getRes.json();
-    const sha = fileData.sha;
+    var url = 'https://api.github.com/repos/' + OWNER + '/' + REPO + '/contents/' + DATA_PATH;
+    var getRes = await fetch(url, { headers: { 'Authorization': 'token ' + token } });
+    var fileData = await getRes.json();
+    var sha = fileData.sha;
 
-    // 2. 解析当前内容
-    const currentContent = atob(fileData.content);
-    const currentData = JSON.parse(currentContent);
-
-    // 3. 添加新记录
+    var currentContent = b64Decode(fileData.content);
+    var currentData = JSON.parse(currentContent);
     currentData.push(memory);
 
-    // 4. 写回
-    const newContent = JSON.stringify(currentData, null, 2);
-    const putRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${DATA_PATH}`, {
+    var newContent = JSON.stringify(currentData, null, 2);
+    var body = JSON.stringify({
+      message: memory.title + ' - by Lizi',
+      content: b64Encode(newContent),
+      sha: sha
+    });
+
+    var putRes = await fetch(url, {
       method: 'PUT',
-      headers: {
-        'Authorization': `token ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        message: `📝 ${memory.title} - by Lizi ♥ Virs`,
-        content: btoa(unescape(encodeURIComponent(newContent))),
-        sha: sha
-      })
+      headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
+      body: body
     });
 
     if (putRes.ok) {
@@ -238,7 +223,7 @@ async function addMemory(memory) {
       render();
       return true;
     } else {
-      const err = await putRes.json();
+      var err = await putRes.json();
       alert('保存失败：' + (err.message || '未知错误'));
       return false;
     }
@@ -248,35 +233,36 @@ async function addMemory(memory) {
   }
 }
 
-// 弹窗控制
-document.getElementById('fabBtn').onclick = () => {
-  const today = new Date().toISOString().slice(0,10);
-  document.getElementById('inputDate').value = today;
+document.getElementById('fabBtn').onclick = function() {
+  document.getElementById('inputDate').value = new Date().toISOString().slice(0,10);
   document.getElementById('inputTag').value = '日常';
   document.getElementById('inputTitle').value = '';
   document.getElementById('inputContent').value = '';
   document.getElementById('modalOverlay').classList.add('show');
 };
-document.getElementById('btnCancel').onclick = () => {
+
+document.getElementById('btnCancel').onclick = function() {
   document.getElementById('modalOverlay').classList.remove('show');
 };
-document.getElementById('modalOverlay').onclick = (e) => {
+
+document.getElementById('modalOverlay').onclick = function(e) {
   if (e.target === e.currentTarget) document.getElementById('modalOverlay').classList.remove('show');
 };
-document.getElementById('btnSave').onclick = async () => {
-  const date = document.getElementById('inputDate').value;
-  const tag = document.getElementById('inputTag').value;
-  const title = document.getElementById('inputTitle').value.trim();
-  const content = document.getElementById('inputContent').value.trim();
+
+document.getElementById('btnSave').onclick = async function() {
+  var date = document.getElementById('inputDate').value;
+  var tag = document.getElementById('inputTag').value;
+  var title = document.getElementById('inputTitle').value.trim();
+  var content = document.getElementById('inputContent').value.trim();
   if (!date || !title || !content) {
     alert('请填完整再保存～');
     return;
   }
-  const btn = document.getElementById('btnSave');
+  var btn = document.getElementById('btnSave');
   btn.textContent = '⏳ 保存中...';
   btn.disabled = true;
 
-  const ok = await addMemory({ date, tag, title, content });
+  var ok = await addMemory({ date: date, tag: tag, title: title, content: content });
 
   btn.textContent = '💾 保存';
   btn.disabled = false;
@@ -285,25 +271,16 @@ document.getElementById('btnSave').onclick = async () => {
   }
 };
 
-// 导航切换
-document.querySelectorAll('.nav button').forEach(btn => {
-  btn.onclick = () => {
-    document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+document.querySelectorAll('.nav button').forEach(function(btn) {
+  btn.onclick = function() {
+    document.querySelectorAll('.nav button').forEach(function(b) { b.classList.remove('active'); });
     btn.classList.add('active');
     currentTag = btn.dataset.tag;
     render();
   };
 });
 
-// 初始加载
 loadMemories();
-
-// 手动设置令牌入口
-document.getElementById('settingsLink').onclick = () => {
-  document.getElementById('tokenInput').value = localStorage.getItem('github_token') || '';
-  document.getElementById('tokenOverlay').classList.add('show');
-};
-
 </script>
 </body>
 </html>
